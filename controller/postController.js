@@ -4,7 +4,7 @@ import * as postModel from '../model/postDB.js';
 
 export const getPost = async (req, res) => {
     try {
-        const post = await postModel.getPost(pool, req.params);
+        const post = await postModel.readPost(pool, req.params);
         if (post){
             res.json(post);
         } else {
@@ -18,7 +18,9 @@ export const getPost = async (req, res) => {
 
 export const createPost = async (req, res) => {
     try {
+        
         const post = await postModel.createPost(pool, req.body);
+        
         if (post){
             res.json(post);
         } else {
@@ -34,7 +36,7 @@ export const updatePost = async (req, res) => {
         await postModel.updatePost(pool, req.body);
         res.sendStatus(204)
     } catch (err){
-        res.sendStatus(500);
+        res.status(500).send(err.message);
     }
 }
 
