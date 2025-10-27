@@ -3,7 +3,7 @@ export const createUser = async (SQLClient, { username, email, password, photo =
   const { rows } = await SQLClient.query(
     `INSERT INTO client (username, email, password, photo, is_admin)
      VALUES ($1, $2, $3, $4, $5)
-     RETURNING id, username, email, registration_date, photo, is_admin`,
+     RETURNING *`,
     [username, email, password, photo, is_admin]
   );
   return rows[0];
@@ -44,7 +44,7 @@ export const updateUser = async (SQLClient, { id, username, email, password, pho
          photo = COALESCE($4, photo),
          is_admin = COALESCE($5, is_admin)
      WHERE id = $6
-     RETURNING id, username, email, registration_date, photo, is_admin`,
+     RETURNING *`,
     [username, email, password, photo, is_admin, id]
   );
   return rows[0] || null;
