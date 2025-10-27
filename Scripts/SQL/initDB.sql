@@ -20,6 +20,42 @@ CREATE TABLE Adresse (
     id_user INT REFERENCES Utilisateur(id_user) ON DELETE CASCADE
 );
 
+CREATE TABLE Post (
+    id SERIAL PRIMARY KEY,
+    post_date DATETIME NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    title VARCHAR(50) NOT NULL,
+    number_of_places INT NOT NULL,
+    Annonce_status ENUM('disponible','indisponible') NOT NULL DEFAULT 'disponible',
+    Photo VARCHAR(255) NULL,
+    address_id INT NOT NULL,
+    user_id INT NOT NULL,
+    CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES Addresse(id)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES User(id)
+    ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
+CREATE TABLE AnnonceDon (
+  id_Annonce INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  date_poste DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  Description TEXT NULL,
+  titre VARCHAR(50) NOT NULL,
+  nbplaces INT NOT NULL,
+  Annonce_status ENUM('disponible','indisponible') NOT NULL DEFAULT 'disponible',
+  Photo VARCHAR(255) NULL,
+  id_Adresse INT NOT NULL,
+  id_user INT NOT NULL,
+  CONSTRAINT fk_annonce_adresse FOREIGN KEY (id_Adresse) REFERENCES Adresse(idAdresse)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_annonce_user FOREIGN KEY (id_user) REFERENCES Utilisateur(id_user)
+    ON DELETE RESTRICT ON UPDATE CASCADE,
+  INDEX idx_annonce_user (id_user),
+  INDEX idx_annonce_status (Annonce_status)
+) ENGINE=InnoDB;
+
+
 -- Insérer l'utilisateur Clotilde et une adresse
 INSERT INTO Utilisateur (NomUser, email, mot_de_passe, is_admin)
 VALUES ('Clotilde', 'clotilde@example.com', 'motdepasse', FALSE);
