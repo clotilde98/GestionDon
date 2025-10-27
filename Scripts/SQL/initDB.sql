@@ -26,34 +26,13 @@ CREATE TABLE Post (
     description VARCHAR(255) NOT NULL,
     title VARCHAR(50) NOT NULL,
     number_of_places INT NOT NULL,
-    Annonce_status ENUM('disponible','indisponible') NOT NULL DEFAULT 'disponible',
-    Photo VARCHAR(255) NULL,
+    post_status ENUM('available','unavailable') NOT NULL DEFAULT 'available',
+    photo VARCHAR(255) NULL,
     address_id INT NOT NULL,
     user_id INT NOT NULL,
-    CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES Addresse(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES User(id)
-    ON DELETE RESTRICT ON UPDATE CASCADE
+    address_id INT REFERENCES Address(id) ON DELETE CASCADE, 
+    user_id INT REFERENCES user(id) ON DELETE CASCADE
 );
-
-
-CREATE TABLE AnnonceDon (
-  id_Annonce INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  date_poste DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  Description TEXT NULL,
-  titre VARCHAR(50) NOT NULL,
-  nbplaces INT NOT NULL,
-  Annonce_status ENUM('disponible','indisponible') NOT NULL DEFAULT 'disponible',
-  Photo VARCHAR(255) NULL,
-  id_Adresse INT NOT NULL,
-  id_user INT NOT NULL,
-  CONSTRAINT fk_annonce_adresse FOREIGN KEY (id_Adresse) REFERENCES Adresse(idAdresse)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_annonce_user FOREIGN KEY (id_user) REFERENCES Utilisateur(id_user)
-    ON DELETE RESTRICT ON UPDATE CASCADE,
-  INDEX idx_annonce_user (id_user),
-  INDEX idx_annonce_status (Annonce_status)
-) ENGINE=InnoDB;
 
 
 -- Insérer l'utilisateur Clotilde et une adresse
@@ -62,3 +41,7 @@ VALUES ('Clotilde', 'clotilde@example.com', 'motdepasse', FALSE);
 
 INSERT INTO Adresse (rue, numero, ville, code_postal, id_user)
 VALUES ('Rue des Fleurs', 15, 'Namur', '5000', 1);
+
+INSERT INTO Post (post_date, description, title, number_of_places, post_status, photo, address_id, user_id) 
+VALUES 
+('2025-10-27 10:00:00', 'Tres bonnes pommes', 'Pommes a donner', 3, 'available', NULL, 1, 1);
