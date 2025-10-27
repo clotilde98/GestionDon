@@ -1,9 +1,9 @@
 // Créer une adresse pour un utilisateur
 export const createAddress = async (SQLClient, { street, number, city, postal_code }, user_id) => {
   const { rows } = await SQLClient.query(
-    `INSERT INTO addresses (street, number, city, postal_code, user_id)
+    `INSERT INTO address (street, number, city, postal_code, user_id)
      VALUES ($1, $2, $3, $4, $5)
-     RETURNING id, street, number, city, postal_code, user_id`,
+     RETURNING *`,
     [street, number, city, postal_code, user_id]
   );
   return rows[0];
@@ -12,7 +12,7 @@ export const createAddress = async (SQLClient, { street, number, city, postal_co
 // Récupérer la première adresse d'un utilisateur
 export const getAddressByUser = async (SQLClient, user_id) => {
   const { rows } = await SQLClient.query(
-    `SELECT * FROM addresses
+    `SELECT * FROM address
      WHERE user_id = $1
      ORDER BY id
      LIMIT 1`,
@@ -24,7 +24,7 @@ export const getAddressByUser = async (SQLClient, user_id) => {
 // Mettre à jour la première adresse d'un utilisateur
 export const updateAddress = async (SQLClient, id, { street, number, city, postal_code }) => {
   const { rows } = await SQLClient.query(
-    `UPDATE addresses
+    `UPDATE address
      SET street = COALESCE($1, street),
          number = COALESCE($2, number),
          city = COALESCE($3, city),
@@ -39,7 +39,7 @@ export const updateAddress = async (SQLClient, id, { street, number, city, posta
 // Supprimer une adresse
 export const deleteAddress = async (SQLClient, id) => {
   const { rowCount } = await SQLClient.query(
-    `DELETE FROM addresses WHERE id = $1`,
+    `DELETE FROM address WHERE id = $1`,
     [id]
   );
   return rowCount > 0;
