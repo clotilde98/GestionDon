@@ -1,23 +1,24 @@
 DROP TABLE IF EXISTS Adresse CASCADE;
 DROP TABLE IF EXISTS Utilisateur CASCADE;
 
-CREATE TABLE Utilisateur (
-    id_user SERIAL PRIMARY KEY,
-    NomUser VARCHAR(50) NOT NULL,
+
+CREATE TABLE User (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    mot_de_passe VARCHAR(255) NOT NULL,
-    date_inscription DATE DEFAULT NOW(),
+    password VARCHAR(255) NOT NULL,
+    registration_date DATE DEFAULT NOW(),
     photo TEXT,
     is_admin BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE Adresse (
-    idAdresse SERIAL PRIMARY KEY,
-    rue VARCHAR(100) NOT NULL,
-    numero INT NOT NULL,
-    ville VARCHAR(50) NOT NULL,
-    code_postal VARCHAR(10) NOT NULL,
-    id_user INT REFERENCES Utilisateur(id_user) ON DELETE CASCADE
+CREATE TABLE Addresse (
+    id SERIAL PRIMARY KEY,
+    street VARCHAR(100) NOT NULL,
+    number INT NOT NULL,
+    city VARCHAR(50) NOT NULL,
+    postal_code VARCHAR(10) NOT NULL,
+    user_id INT NOT NULL REFERENCES User(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Post (
