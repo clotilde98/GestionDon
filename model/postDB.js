@@ -68,4 +68,3 @@ export const readPost = async (SQLClient, {id}) => {
     return rows[0];
 };
 
-d
