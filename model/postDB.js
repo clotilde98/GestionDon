@@ -1,23 +1,20 @@
-export const createPost = async (SQLClient, { post_date, description, title, number_of_places, photo, address_id, client_id}) => {
+export const createPost = async (SQLClient, {description, title, number_of_places, photo, address_id, client_id}) => {
   const { rows } = await SQLClient.query(
-    `INSERT INTO Post (post_date, description, title, number_of_places, post_status, photo, address_id, client_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `INSERT INTO Post (description, title, number_of_places, post_status, photo, address_id, client_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING * `,
-    [post_date, description, title, number_of_places, 'available', photo, address_id, client_id]
+    [description, title, number_of_places, 'available', photo, address_id, client_id]
   );
   return rows[0];
 };
 
 
 
-export const updatePost = async(SQLClient, {id, post_date, description, title, number_of_places, post_status, photo, address_id, client_id}) => {
+export const updatePost = async(SQLClient, {id, description, title, number_of_places, post_status, photo, address_id, client_id}) => {
     let query = "UPDATE post SET ";
     const querySet = [];
     const queryValues = [];
-    if(post_date){
-        queryValues.push(post_date);
-        querySet.push(`post_date = $${queryValues.length}`);
-    }
+    
     if(description){
         queryValues.push(description);
         querySet.push(`description = $${queryValues.length}`);
