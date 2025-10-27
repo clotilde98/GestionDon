@@ -13,9 +13,9 @@ CREATE TABLE Client (
 CREATE TABLE Address (
     id SERIAL PRIMARY KEY,
     street VARCHAR(100) NOT NULL,
-    numero INT NOT NULL,
+    numero INT NOT NULL CHECK (numero > 0),
     city VARCHAR(50) NOT NULL,
-    postal_code VARCHAR(10) NOT NULL,
+    postal_code VARCHAR(10) NOT NULL CHECK (postal_code > 0),
     client_id INT REFERENCES Client(id) ON DELETE CASCADE
 );
 
