@@ -159,8 +159,6 @@ export const searchUsersByUsername = async (req, res) => {
 };
 
 
-// Assurez-vous d'importer la fonction du Modèle
-const { findUsersByUsernamePAGINATED } = require('../models/userModel'); 
 
 
 export const searchUsersPAGINATED = async (req, res) => {
