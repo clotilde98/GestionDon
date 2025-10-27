@@ -28,7 +28,7 @@ CREATE TABLE Post (
     post_status ENUM('available','unavailable') NOT NULL DEFAULT 'available',
     photo VARCHAR(255) NULL,
     address_id INT NOT NULL REFERENCES Address(id) ON DELETE CASCADE, 
-    user_id INT NOT NULL REFERENCES user(id) ON DELETE CASCADE
+    user_id INT NOT NULL REFERENCES User(id) ON DELETE CASCADE
 );
 
 
