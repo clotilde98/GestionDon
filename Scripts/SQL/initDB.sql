@@ -33,10 +33,10 @@ CREATE TABLE Post (
 
 
 -- Insérer l'utilisateur Clotilde et une adresse
-INSERT INTO Utilisateur (username, email, password, is_admin)
+INSERT INTO User (username, email, password, is_admin)
 VALUES ('Clotilde', 'clotilde@example.com', 'motdepasse', FALSE);
 
-INSERT INTO Adresse (street, numero, city, postal_code, user_id)
+INSERT INTO Address (street, numero, city, postal_code, user_id)
 VALUES ('Rue des Fleurs', 15, 'Namur', '5000', 1);
 
 INSERT INTO Post (post_date, description, title, number_of_places, post_status, photo, address_id, user_id) 
