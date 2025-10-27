@@ -28,10 +28,8 @@ CREATE TABLE Post (
     number_of_places INT NOT NULL,
     post_status ENUM('available','unavailable') NOT NULL DEFAULT 'available',
     photo VARCHAR(255) NULL,
-    address_id INT NOT NULL,
-    user_id INT NOT NULL,
-    address_id INT REFERENCES Address(id) ON DELETE CASCADE, 
-    user_id INT REFERENCES user(id) ON DELETE CASCADE
+    address_id INT NOT NULL REFERENCES Address(id) ON DELETE CASCADE, 
+    user_id INT NOT NULL REFERENCES user(id) ON DELETE CASCADE
 );
 
 
