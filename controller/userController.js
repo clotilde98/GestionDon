@@ -8,33 +8,34 @@ export const createUserWithAddresses = async (req, res) => {
   try {
     const { user, addresses } = req.body;
 
-    if (!user || !user.email || !user.NomUser || !user.mot_de_passe) {
+    if (!user || !user.email || !user.username || !user.password) {
       return res.status(400).json({ error: "Données utilisateur incomplètes" });
     }
 
     SQLClient = await pool.connect();
     await SQLClient.query("BEGIN");
 
+    // Création de l'utilisateur
     const newUser = await userModel.createUser(SQLClient, user);
 
+    // Création des adresses si présentes
     if (addresses && Array.isArray(addresses)) {
       for (const addr of addresses) {
-        await addressModel.createAddress(SQLClient, addr, newUser.id_user);
+        await addressModel.createAddress(SQLClient, addr, newUser.id);
       }
     }
 
     await SQLClient.query("COMMIT");
-    res.status(201).json({ message: "Utilisateur et adresses créés", user: newUser });
+    res.status(201).json({ message: "Utilisateur et adresses créés avec succès", user: newUser });
 
   } catch (err) {
-    console.error("Erreur création utilisateur:", err.message);
+    console.error("Erreur lors de la création de l'utilisateur :", err.message);
     if (SQLClient) await SQLClient.query("ROLLBACK");
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Erreur lors de la création de l'utilisateur" });
   } finally {
     if (SQLClient) SQLClient.release();
   }
 };
-
 
 // Lire un utilisateur + sa première adresse
 export const getUserWithAddress = async (req, res) => {
@@ -47,7 +48,7 @@ export const getUserWithAddress = async (req, res) => {
 
     res.json(userWithAddress);
   } catch (err) {
-    console.error("Erreur lecture utilisateur:", err);
+    console.error("Erreur lors de la lecture de l'utilisateur :", err.message);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
@@ -56,44 +57,41 @@ export const getUserWithAddress = async (req, res) => {
 export const updateUserWithAddress = async (req, res) => {
   let SQLClient;
   try {
-    const id_user = parseInt(req.params.id);
-    if (isNaN(id_user)) return res.status(400).json({ error: "ID invalide" });
+    const userId = parseInt(req.params.id);
+    if (isNaN(userId)) return res.status(400).json({ error: "ID invalide" });
 
     SQLClient = await pool.connect();
     await SQLClient.query("BEGIN");
 
-    // Mettre à jour l'utilisateur
-    const updatedUser = await userModel.updateUser(SQLClient, { id_user, ...req.body.user });
+    // Mise à jour de l'utilisateur
+    const updatedUser = await userModel.updateUser(SQLClient, { id: userId, ...req.body.user });
     if (!updatedUser) {
       await SQLClient.query("ROLLBACK");
       return res.status(404).json({ error: "Utilisateur non trouvé" });
     }
 
-    // Mettre à jour la première adresse si présente
+    // Mise à jour de la première adresse si présente
     if (req.body.address) {
-      // Récupérer la première adresse de l'utilisateur
-      const existingAddress = await addressModel.getAddressByUser(SQLClient, id_user);
+      const existingAddress = await addressModel.getAddressByUser(SQLClient, userId);
       if (!existingAddress) {
         await SQLClient.query("ROLLBACK");
         return res.status(404).json({ error: "Adresse non trouvée" });
       }
 
-      // Mettre à jour cette adresse
-      await addressModel.updateAddress(SQLClient, existingAddress.idAdresse, req.body.address);
+      await addressModel.updateAddress(SQLClient, existingAddress.id, req.body.address);
     }
 
     await SQLClient.query("COMMIT");
-    res.json({ message: "Utilisateur et première adresse mis à jour", user: updatedUser });
+    res.json({ message: "Utilisateur et première adresse mis à jour avec succès", user: updatedUser });
 
   } catch (err) {
-    console.error("Erreur mise à jour utilisateur:", err);
+    console.error("Erreur lors de la mise à jour de l'utilisateur :", err.message);
     if (SQLClient) await SQLClient.query("ROLLBACK");
-    res.status(500).json({ error: "Erreur lors de la mise à jour" });
+    res.status(500).json({ error: "Erreur lors de la mise à jour de l'utilisateur" });
   } finally {
     if (SQLClient) SQLClient.release();
   }
 };
-
 
 // Supprimer un utilisateur + toutes ses adresses
 export const deleteUser = async (req, res) => {
@@ -104,9 +102,10 @@ export const deleteUser = async (req, res) => {
     const success = await userModel.deleteUser(pool, id);
     if (!success) return res.status(404).json({ error: "Utilisateur non trouvé" });
 
-    res.json({ message: "Utilisateur et ses adresses supprimés" });
+    res.json({ message: "Utilisateur et toutes ses adresses supprimés avec succès" });
   } catch (err) {
-    console.error("Erreur suppression utilisateur:", err);
+    console.error("Erreur lors de la suppression de l'utilisateur :", err.message);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
+
