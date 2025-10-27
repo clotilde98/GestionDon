@@ -40,7 +40,7 @@ export const createUserWithAddresses = async (req, res) => {
 // Lire un utilisateur + sa première adresse
 export const getUserWithAddress = async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.body.id);
     if (isNaN(id)) return res.status(400).json({ error: "ID invalide" });
 
     const userWithAddress = await userModel.getUserWithAddress(pool, id);
@@ -57,7 +57,7 @@ export const getUserWithAddress = async (req, res) => {
 export const updateUserWithAddress = async (req, res) => {
   let SQLClient;
   try {
-    const userId = parseInt(req.params.id);
+    const userId = parseInt(req.body.id);
     if (isNaN(userId)) return res.status(400).json({ error: "ID invalide" });
 
     SQLClient = await pool.connect();
@@ -96,7 +96,7 @@ export const updateUserWithAddress = async (req, res) => {
 // Supprimer un utilisateur + toutes ses adresses
 export const deleteUser = async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.body.id);
     if (isNaN(id)) return res.status(400).json({ error: "ID invalide" });
 
     const success = await userModel.deleteUser(pool, id);
