@@ -130,42 +130,36 @@ export const deleteUser = async (req, res) => {
 
 export const searchUsersByUsername = async (req, res) => {
     
+    const searchTerm = req.query.q; // Extraction du terme de recherche
+    
     if (!searchTerm || searchTerm.length < 2) { 
-        // Valide si le terme est présent et suffisamment long
         return res.status(400).json({ error: "Le terme de recherche (q) est requis et doit contenir au moins 2 caractères." });
     }
 
     try {
-        // 2. Appel du Modèle pour exécuter la logique de recherche dans la DB
         const userResults = await findUsersByUsername(pool, searchTerm); 
 
-        // 3. Gestion des résultats
         if (userResults.length === 0) {
-            // Aucun résultat trouvé
             return res.status(404).json({ error: "Aucun utilisateur trouvé correspondant au nom : " + searchTerm });
         }
         
-        // Succès : retourne la liste des utilisateurs
         res.json({
             count: userResults.length,
             users: userResults
         });
 
     } catch (err) {
-        // 4. Gestion des erreurs serveur (DB, requête mal formée, etc.)
         console.error("Erreur lors de la recherche des utilisateurs :", err.message);
         res.status(500).json({ error: "Erreur serveur lors de la recherche des utilisateurs" });
     }
 };
 
-
-
-
 export const searchUsersPAGINATED = async (req, res) => {
     
-    const pool = req.app.get('pool'); 
-    
-    
+    // Si 'pool' n'est pas importé ou accessible globalement, utilisez l'importation 'pool'
+    // sinon, si vous l'injectez, utilisez req.app.get('pool') comme vous l'aviez fait.
+    const dbClient = pool; // Utiliser l'importation 'pool'
+
     // Valeurs par défaut : 'q' est vide, page=1, limit=10
     const searchTerm = req.query.q || ''; 
     const page = parseInt(req.query.page, 10) || 1; 
@@ -179,20 +173,17 @@ export const searchUsersPAGINATED = async (req, res) => {
     const offset = (page - 1) * limit;
 
     try {
-        // 2. Appel du Modèle
-        const { totalCount, users } = await findUsersByUsernamePAGINATED(pool, searchTerm, limit, offset); 
+        const { totalCount, users } = await findUsersByUsernamePAGINATED(dbClient, searchTerm, limit, offset); 
 
-        // 3. Préparation des Métadonnées de Pagination
+        // Préparation des Métadonnées de Pagination
         const totalPages = Math.ceil(totalCount / limit);
         
         if (page > totalPages && totalPages > 0) {
-             // Redirige ou signale si la page demandée n'existe pas
              return res.status(404).json({ error: `La page ${page} n'existe pas.` });
         }
 
-        // 4. Envoi de la Réponse JSON
+        // Envoi de la Réponse JSON
         res.status(200).json({
-            // Métadonnées de pagination pour le Front-end
             pagination: {
                 totalCount: totalCount,
                 totalPages: totalPages,
@@ -201,40 +192,33 @@ export const searchUsersPAGINATED = async (req, res) => {
                 hasNextPage: page < totalPages,
                 hasPreviousPage: page > 1,
             },
-            // Les résultats réels
             users: users
         });
 
     } catch (err) {
-        // 5. Gestion des Erreurs Serveur
         console.error("Erreur Contrôleur (Pagination) :", err.message);
         res.status(500).json({ error: "Erreur serveur lors du traitement de la recherche paginée." });
     }
 };
 
-module.exports = {
-    searchUsersPAGINATED
-};
-
-
 export const searchUsersWithFilter = async (req, res) => {
     
+    const dbClient = pool; // Utiliser l'importation 'pool'
     
     // 1. Extraction et Validation des Paramètres
     const searchTerm = req.query.q || ''; 
     const adminFilter = req.query.filter || 'all'; // Défaut : 'all'
     
     if (searchTerm.length < 1 && adminFilter === 'all') {
-        // Optionnel : ne pas autoriser la recherche si les champs sont vides
         return res.status(400).json({ error: "Veuillez fournir un terme de recherche ou un filtre spécifique." });
     }
 
     try {
         // 2. Appel du Modèle avec le paramètre de filtre
         const userResults = await findUsersByUsernameAndFilter(
-            pool, 
+            dbClient, // Utiliser l'objet pool importé
             searchTerm, 
-            adminFilter // Le filtre simple
+            adminFilter 
         ); 
 
         // 3. Gestion de la Réponse
@@ -253,8 +237,4 @@ export const searchUsersWithFilter = async (req, res) => {
         console.error("Erreur Contrôleur (Filtre Simple) :", err.message);
         res.status(500).json({ error: "Erreur serveur lors de l'exécution de la recherche avec filtre." });
     }
-};
-
-module.exports = {
-    searchUsersWithFilter
 };
