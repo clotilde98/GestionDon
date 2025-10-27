@@ -1,12 +1,12 @@
-DROP TABLE IF EXISTS Adresse CASCADE;
-DROP TABLE IF EXISTS Utilisateur CASCADE;
+DROP TABLE IF EXISTS Addresse CASCADE;
+DROP TABLE IF EXISTS User CASCADE;
 
 CREATE TABLE Utilisateur (
     id_user SERIAL PRIMARY KEY,
     NomUser VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    mot_de_passe VARCHAR(255) NOT NULL,
-    date_inscription DATE DEFAULT NOW(),
+    password VARCHAR(255) NOT NULL,
+    registration_date DATE DEFAULT NOW(),
     photo TEXT,
     is_admin BOOLEAN DEFAULT FALSE
 );
@@ -34,10 +34,10 @@ CREATE TABLE Post (
 
 
 -- Insérer l'utilisateur Clotilde et une adresse
-INSERT INTO Utilisateur (NomUser, email, mot_de_passe, is_admin)
+INSERT INTO Utilisateur (username, email, password, is_admin)
 VALUES ('Clotilde', 'clotilde@example.com', 'motdepasse', FALSE);
 
-INSERT INTO Adresse (rue, numero, ville, code_postal, id_user)
+INSERT INTO Adresse (street, numero, city, postal_code, user_id)
 VALUES ('Rue des Fleurs', 15, 'Namur', '5000', 1);
 
 INSERT INTO Post (post_date, description, title, number_of_places, post_status, photo, address_id, user_id) 
