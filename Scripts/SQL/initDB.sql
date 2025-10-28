@@ -19,7 +19,6 @@ CREATE TABLE Address (
     numero INT NOT NULL ,
     city VARCHAR(50) NOT NULL,
     postal_code VARCHAR(10) NOT NULL,
-    CHECK (postal_code>0) ,
     CHECK (numero > 0),
     client_id INT REFERENCES Client(id) ON DELETE CASCADE
 );

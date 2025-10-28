@@ -13,9 +13,9 @@ export const readReservation = async (SQLClient, {id}) => {
     return rows[0];
 };
 
-export const readReservationByClientID = async (SQLClient, {id}) => {
+export const readReservationsByClientID = async (SQLClient, {id}) => {
     const {rows} = await SQLClient.query("SELECT * FROM Reservation WHERE client_id = $1", [id]);
-    return rows[0];
+    return rows;
 };
 
 export const readReservationsByPostID = async (SQLClient, {id}) => {

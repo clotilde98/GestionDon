@@ -10,19 +10,16 @@ export const createUser = async (SQLClient, { username, email, password, photo =
 };
 
 export const getUserById = async (SQLClient, id) => {
-    const { rows } = await SQLClient.query(
-        `SELECT id, username, email, registration_date, photo, is_admin
-         FROM Client
-         WHERE id = $1`,
-        [id]
-    );
-    return rows[0] || null;
+  const { rows } = await SQLClient.query(
+    `SELECT id, username, email, registration_date, photo, is_admin
+     FROM Client
+     WHERE id = $1`,
+    [id]
+  );
+  return rows[0] || null;
 };
 
-export const getUserById = async (SQLClient, id) => {
-  const { rows } = await SQLClient.query(`SELECT * FROM Client WHERE id = $1`, [id]);
-  return rows[0];
-}; 
+
 
 // Lire un utilisateur + sa première adresse
 export const getUserWithAddress = async (SQLClient, id) => {
