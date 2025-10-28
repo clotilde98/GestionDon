@@ -1,16 +1,16 @@
-export const createPost = async (SQLClient, {description, title, number_of_places, photo, address_id, client_id}) => {
+export const createPost = async (SQLClient, {description, title, numberOfPlaces, photo, addressID, clientID}) => {
   const { rows } = await SQLClient.query(
     `INSERT INTO Post (description, title, number_of_places, post_status, photo, address_id, client_id)
      VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING * `,
-    [description, title, number_of_places, 'available', photo, address_id, client_id]
+    [description, title, numberOfPlaces, 'available', photo, addressID, clientID]
   );
   return rows[0];
 };
 
 
 
-export const updatePost = async(SQLClient, {id, description, title, number_of_places, post_status, photo, address_id, client_id}) => {
+export const updatePost = async(SQLClient, {id, description, title, numberOfPlaces, postStatus, photo, addressID, clientID}) => {
     let query = "UPDATE post SET ";
     const querySet = [];
     const queryValues = [];
@@ -25,13 +25,13 @@ export const updatePost = async(SQLClient, {id, description, title, number_of_pl
         querySet.push(`title = $${queryValues.length}`);
     }
 
-    if (number_of_places){
-        queryValues.push(number_of_places);
+    if (numberOfPlaces){
+        queryValues.push(numberOfPlaces);
         querySet.push(`number_of_places = $${queryValues.length}`);
     }
 
-    if (post_status){
-        queryValues.push(post_status);
+    if (postStatus){
+        queryValues.push(postStatus);
         querySet.push(`post_status = $${queryValues.length}`);
     }
 
@@ -40,13 +40,14 @@ export const updatePost = async(SQLClient, {id, description, title, number_of_pl
         querySet.push(`photo = $${queryValues.length}`);
     }
 
-    if (address_id){
-        queryValues.push(address_id);
+    if (addressID){
+        queryValues.push(addressID);
         querySet.push(`address_id = $${queryValues.length}`);
     }
 
-    if (client_id){
-        queryValues.push(client_id);
+
+    if (clientID){
+        queryValues.push(clientID);
         querySet.push(`client_id = $${queryValues.length}`);
     }
 

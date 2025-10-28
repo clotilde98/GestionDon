@@ -1,10 +1,11 @@
-export const createReservation = async (SQLClient, {post_id, client_id}) => {
-  const { rows } = await SQLClient.query(
+
+export const createReservation = async (SQLClient, {postID, clientID}) => {
+    const { rows } = await SQLClient.query(
     `INSERT INTO Reservation (post_id, client_id)
      VALUES ($1, $2)
      RETURNING * `,
-    [post_id, client_id]
-  );
+    [postID, clientID]
+    );
   return rows[0];
 };
 
@@ -24,18 +25,18 @@ export const readReservationsByPostID = async (SQLClient, {id}) => {
 };
 
 
-export const updateReservation = async(SQLClient, {id, reservation_date, reservation_status}) => {
+export const updateReservation = async(SQLClient, {id, reservationDate, reservationStatus}) => {
     let query = "UPDATE reservation SET ";
     const querySet = [];
     const queryValues = [];
     
-    if(reservation_date){
-        queryValues.push(reservation_date);
+    if(reservationDate){
+        queryValues.push(reservationDate);
         querySet.push(`reservation_date = $${queryValues.length}`);
     }
 
-    if (reservation_status){
-        queryValues.push(reservation_status);
+    if (reservationStatus){
+        queryValues.push(reservationStatus);
         querySet.push(`reservation_status = $${queryValues.length}`);
     }
 
