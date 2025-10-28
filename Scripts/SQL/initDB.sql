@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS Reservation;
 DROP TABLE IF EXISTS Post;
 DROP TABLE IF EXISTS Address;
 DROP TABLE IF EXISTS Client;
@@ -36,6 +37,17 @@ CREATE TABLE Post (
     client_id INT NOT NULL REFERENCES Client(id) ON DELETE CASCADE
 );
 
+CREATE TABLE Reservation (
+    id SERIAL PRIMARY KEY,
+    reservation_date DATE DEFAULT NOW(),
+    reservation_status VARCHAR(20) NOT NULL DEFAULT 'confirmed',
+    CHECK (reservation_status IN ('confirmed', 'cancelled')),
+    post_id INT NOT NULL REFERENCES Post(id) ON DELETE CASCADE,
+    client_id INT NOT NULL REFERENCES Client(id) ON DELETE CASCADE
+);
+
+
+
 
 -- Insérer l'utilisateur Clotilde et une adresse
 INSERT INTO Client (username, email, password, is_admin)
@@ -47,3 +59,5 @@ VALUES ('Rue des Fleurs', 15, 'Namur', '5000', 1);
 INSERT INTO Post (description, title, number_of_places, post_status, photo, address_id, client_id) 
 VALUES 
 ('Tres bonnes pommes', 'Pommes a donner', 3, 'available', NULL, 1, 1);
+
+INSERT INTO Reservation (post_id, client_id) VALUES (1, 1);

@@ -12,7 +12,7 @@ export const getPost = async (req, res) => {
         if (post){
             res.json(post);
         } else {
-            res.sendStatus(404).send("Post not found");
+            res.status(404).send("Post not found");
         }
     } catch (err) {
         res.status(500).send(err.message);
