@@ -12,6 +12,24 @@ export const createUserWithAddresses = async (req, res) => {
       return res.status(400).json({ error: "Données utilisateur incomplètes" });
     }
 
+   if (addresses && Array.isArray(addresses)) {
+            for (const addr of addresses) {
+                // Contrôle Numéro de Rue
+                if (addr.number !== undefined && addr.number !== null && addr.number < 0) {
+                    return res.status(400).json({
+                        error: "Le numéro de rue doit être un nombre positif ou nul."
+                    });
+                }
+                
+                // Contrôle Code Postal
+                if (addr.postal_code !== undefined && addr.postal_code !== null && addr.postal_code < 0) {
+                    return res.status(400).json({
+                        error: "Le code postal doit être un nombre positif ou nul."
+                    });
+                }
+            }
+        }
+
     SQLClient = await pool.connect();
     await SQLClient.query("BEGIN");
 
@@ -109,3 +127,114 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+
+export const searchUsersByUsername = async (req, res) => {
+    
+    const searchTerm = req.query.q; // Extraction du terme de recherche
+    
+    if (!searchTerm || searchTerm.length < 2) { 
+        return res.status(400).json({ error: "Le terme de recherche (q) est requis et doit contenir au moins 2 caractères." });
+    }
+
+    try {
+        const userResults = await findUsersByUsername(pool, searchTerm); 
+
+        if (userResults.length === 0) {
+            return res.status(404).json({ error: "Aucun utilisateur trouvé correspondant au nom : " + searchTerm });
+        }
+        
+        res.json({
+            count: userResults.length,
+            users: userResults
+        });
+
+    } catch (err) {
+        console.error("Erreur lors de la recherche des utilisateurs :", err.message);
+        res.status(500).json({ error: "Erreur serveur lors de la recherche des utilisateurs" });
+    }
+};
+
+export const searchUsersPAGINATED = async (req, res) => {
+    
+    // Si 'pool' n'est pas importé ou accessible globalement, utilisez l'importation 'pool'
+    // sinon, si vous l'injectez, utilisez req.app.get('pool') comme vous l'aviez fait.
+    const dbClient = pool; // Utiliser l'importation 'pool'
+
+    // Valeurs par défaut : 'q' est vide, page=1, limit=10
+    const searchTerm = req.query.q || ''; 
+    const page = parseInt(req.query.page, 10) || 1; 
+    const limit = parseInt(req.query.limit, 10) || 10; 
+    
+    // Validation simple des entrées numériques
+    if (isNaN(page) || page < 1) return res.status(400).json({ error: "Le paramètre 'page' est invalide." });
+    if (isNaN(limit) || limit < 1) return res.status(400).json({ error: "Le paramètre 'limit' est invalide." });
+
+    // Calcul de l'OFFSET : ce que la DB doit sauter
+    const offset = (page - 1) * limit;
+
+    try {
+        const { totalCount, users } = await findUsersByUsernamePAGINATED(dbClient, searchTerm, limit, offset); 
+
+        // Préparation des Métadonnées de Pagination
+        const totalPages = Math.ceil(totalCount / limit);
+        
+        if (page > totalPages && totalPages > 0) {
+             return res.status(404).json({ error: `La page ${page} n'existe pas.` });
+        }
+
+        // Envoi de la Réponse JSON
+        res.status(200).json({
+            pagination: {
+                totalCount: totalCount,
+                totalPages: totalPages,
+                currentPage: page,
+                limit: limit,
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1,
+            },
+            users: users
+        });
+
+    } catch (err) {
+        console.error("Erreur Contrôleur (Pagination) :", err.message);
+        res.status(500).json({ error: "Erreur serveur lors du traitement de la recherche paginée." });
+    }
+};
+
+export const searchUsersWithFilter = async (req, res) => {
+    
+    const dbClient = pool; // Utiliser l'importation 'pool'
+    
+    // 1. Extraction et Validation des Paramètres
+    const searchTerm = req.query.q || ''; 
+    const adminFilter = req.query.filter || 'all'; // Défaut : 'all'
+    
+    if (searchTerm.length < 1 && adminFilter === 'all') {
+        return res.status(400).json({ error: "Veuillez fournir un terme de recherche ou un filtre spécifique." });
+    }
+
+    try {
+        // 2. Appel du Modèle avec le paramètre de filtre
+        const userResults = await findUsersByUsernameAndFilter(
+            dbClient, // Utiliser l'objet pool importé
+            searchTerm, 
+            adminFilter 
+        ); 
+
+        // 3. Gestion de la Réponse
+        if (userResults.length === 0) {
+            return res.status(404).json({ error: "Aucun utilisateur trouvé correspondant à ces critères." });
+        }
+
+        res.status(200).json({
+            count: userResults.length,
+            filter: adminFilter,
+            users: userResults
+        });
+
+    } catch (err) {
+        // 4. Gestion des Erreurs Serveur
+        console.error("Erreur Contrôleur (Filtre Simple) :", err.message);
+        res.status(500).json({ error: "Erreur serveur lors de l'exécution de la recherche avec filtre." });
+    }
+};
