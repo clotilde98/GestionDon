@@ -80,7 +80,7 @@ export const createReservation = async (req, res) => {
                     res.status(201).send(newReservation.id);
                 }
             } else {
-                res.status(409).send("Le nombre de reservation pour l'annonce a atteint le nombre maximal");
+                res.status(409).send("Number of place for the post had already reached the max capacity");
             }
             
         }

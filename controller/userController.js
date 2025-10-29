@@ -2,6 +2,16 @@ import { pool } from "../database/database.js";
 import * as userModel from "../model/userDB.js";
 import * as addressModel from "../model/addressDB.js";
 
+export const createUser = async (req, res) => {
+  try {
+    const newClient = await userModel.createUser(pool, req.body);
+    res.status(201).send("client created " + newClient.id);
+  } catch (err){
+    res.send(err.message)
+  }
+}
+
+
 // Créer un utilisateur + plusieurs adresses
 export const createUserWithAddresses = async (req, res) => {
   let SQLClient;
@@ -62,6 +72,7 @@ export const getUserWithAddress = async (req, res) => {
     if (isNaN(id)) return res.status(400).json({ error: "ID invalide" });
 
     const userWithAddress = await userModel.getUserWithAddress(pool, id);
+    
     if (!userWithAddress) return res.status(404).json({ error: "Utilisateur non trouvé" });
 
     res.json(userWithAddress);

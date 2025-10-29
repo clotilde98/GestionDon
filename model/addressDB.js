@@ -1,7 +1,7 @@
 // Créer une adresse pour un utilisateur
 export const createAddress = async (SQLClient, { street, number, city, postal_code }, user_id) => {
   const { rows } = await SQLClient.query(
-    `INSERT INTO address (street, number, city, postal_code, user_id)
+    `INSERT INTO address (street, numero, city, postal_code, client_id)
      VALUES ($1, $2, $3, $4, $5)
      RETURNING *`,
     [street, number, city, postal_code, user_id]

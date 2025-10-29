@@ -3,12 +3,13 @@ import {
   createUserWithAddresses,
   getUserWithAddress,
   updateUserWithAddress,
-  deleteUser
+  deleteUser,
+  createUser
 } from "../controller/userController.js";
 
 const router = Router();
 
-router.post("/", createUserWithAddresses);           
+router.post("/", createUser);           
 router.get("/:id", getUserWithAddress);         
 router.patch("/", updateUserWithAddress);     
 router.delete("/:id", deleteUser);       
