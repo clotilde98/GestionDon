@@ -1,15 +1,15 @@
-/*import { pool } from '../database/database.js';
+import { pool } from '../database/database.js';
 import * as addressModel from '../model/addressDB.js';
 
 
 export const getAddressesByUser = async (req, res) => {
   try {
-    const user_id = parseInt(req.params.user_id, 10);
+    const id = parseInt(req.params.id, 10);
     if (Number.isNaN(user_id)) {
       return res.status(400).json({ message: 'user_id invalide' });
     }
 
-    const addresses = await addressModel.readAddressesByUser(pool, user_id);
+    const addresses = await addressModel.getAddressesByUser(pool, id);
     res.json(addresses);
   } catch (err) {
     console.error('getAddressesByUser error:', err);
@@ -56,5 +56,3 @@ export const deleteAddress = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur lors de la suppression de l\'adresse' });
   }
 };
-
-*/

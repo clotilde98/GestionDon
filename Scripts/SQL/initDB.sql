@@ -9,17 +9,17 @@ CREATE TABLE Client (
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     registration_date DATE DEFAULT NOW(),
-    photo TEXT,
+    photo VARCHAR(255) NULL,
     is_admin BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE Address (
     id SERIAL PRIMARY KEY,
     street VARCHAR(100) NOT NULL,
-    numero INT NOT NULL ,
+    number INT NOT NULL ,
     city VARCHAR(50) NOT NULL,
     postal_code VARCHAR(10) NOT NULL,
-    CHECK (numero > 0),
+    CHECK (number > 0),
     client_id INT REFERENCES Client(id) ON DELETE CASCADE
 );
 
@@ -53,7 +53,7 @@ CREATE TABLE Reservation (
 INSERT INTO Client (username, email, password, is_admin)
 VALUES ('Clotilde', 'clotilde@example.com', 'motdepasse', FALSE);
 
-INSERT INTO Address (street, numero, city, postal_code, client_id)
+INSERT INTO Address (street, number, city, postal_code, client_id)
 VALUES ('Rue des Fleurs', 15, 'Namur', '5000', 1);
 
 INSERT INTO Post (description, title, number_of_places, post_status, photo, address_id, client_id) 

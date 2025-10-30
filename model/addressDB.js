@@ -1,42 +1,63 @@
-// Créer une adresse pour un utilisateur
-export const createAddress = async (SQLClient, { street, number, city, postal_code }, user_id) => {
+export const createAddress = async (SQLClient, { street, number, city, postalCode }, clientID) => {
   const { rows } = await SQLClient.query(
-    `INSERT INTO address (street, number, city, postal_code, user_id)
+    `INSERT INTO address (street, number, city, postal_code, client_id)
      VALUES ($1, $2, $3, $4, $5)
      RETURNING *`,
-    [street, number, city, postal_code, user_id]
+    [street, number, city, postalCode, clientID]
   );
   return rows[0];
 };
 
-// Récupérer la première adresse d'un utilisateur
-export const getAddressByUser = async (SQLClient, user_id) => {
+export const getAddressByUser = async (SQLClient, clientID) => {
   const { rows } = await SQLClient.query(
-    `SELECT * FROM address
-     WHERE user_id = $1
+    `SELECT street, number, city, postal_code FROM address
+     WHERE client_id = $1
      ORDER BY id
      LIMIT 1`,
-    [user_id]
+    [clientID]
   );
   return rows[0];
 };
 
-// Mettre à jour la première adresse d'un utilisateur
-export const updateAddress = async (SQLClient, id, { street, number, city, postal_code }) => {
-  const { rows } = await SQLClient.query(
-    `UPDATE address
-     SET street = COALESCE($1, street),
-         number = COALESCE($2, number),
-         city = COALESCE($3, city),
-         postal_code = COALESCE($4, postal_code)
-     WHERE id = $5
-     RETURNING *`,
-    [street, number, city, postal_code, id]
-  );
-  return rows[0];
+export const updateAddress = async (SQLClient, id, { street, number, city, postalCode }) => {
+    let query = "UPDATE address SET ";
+    const querySet = []; 
+    const queryValues = []; 
+
+    if (street ) {
+        queryValues.push(street);
+        querySet.push(`street = $${queryValues.length}`);
+    }
+
+    if (number ) {
+        queryValues.push(number);
+        querySet.push(`number = $${queryValues.length}`);
+    }
+
+    if (city) {
+        queryValues.push(city);
+        querySet.push(`city = $${queryValues.length}`);
+    }
+
+    if (postalCode) {
+        queryValues.push(postalCode);
+        querySet.push(`postal_code = $${queryValues.length}`);
+    }
+
+    if (queryValues.length > 0) {
+        queryValues.push(id);
+        
+        
+        query += `${querySet.join(", ")} WHERE id = $${queryValues.length} RETURNING *`;
+        
+        const { rows } = await SQLClient.query(query, queryValues);
+        return rows[0];
+
+    } else {
+        throw new Error("No field given");
+    }
 };
 
-// Supprimer une adresse
 export const deleteAddress = async (SQLClient, id) => {
   const { rowCount } = await SQLClient.query(
     `DELETE FROM address WHERE id = $1`,
