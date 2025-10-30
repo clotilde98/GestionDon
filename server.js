@@ -4,7 +4,7 @@ import {default as Router} from './route/index.js';
 
 
 const app = express();
-const port = 3001;
+const port = 3002;
 
 app.use(express.json());
 app.use(Router);

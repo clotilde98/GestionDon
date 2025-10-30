@@ -71,3 +71,10 @@ export const readPost = async (SQLClient, {id}) => {
     return rows[0];
 };
 
+
+export const searchPostByCategory = async (SQLClient,  {nameCategory}) => {
+    const query = "SELECT * FROM Post p INNER JOIN Post_category pc ON p.id = pc.id_ad INNER JOIN Category_product cp ON cp.id_category = pc.id_category WHERE cp.name_category=$1";
+    const {rows} = await SQLClient.query(query, [nameCategory]);
+    return rows[0];
+};
+
