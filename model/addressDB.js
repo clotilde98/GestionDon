@@ -1,6 +1,10 @@
 export const createAddress = async (SQLClient, { street, number, city, postalCode }, clientID) => {
   const { rows } = await SQLClient.query(
+<<<<<<< HEAD
     `INSERT INTO address (street, number, city, postal_code, client_id)
+=======
+    `INSERT INTO address (street, numero, city, postal_code, client_id)
+>>>>>>> 725ab1990e506c6539c3a77d0631aeed9b74304f
      VALUES ($1, $2, $3, $4, $5)
      RETURNING *`,
     [street, number, city, postalCode, clientID]
