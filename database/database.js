@@ -15,7 +15,6 @@ export const pool = {
   connect: async () => {
     const client = await pgPool.connect();
     return {
-      // expose exactement query(...) et release()
       query: async (queryText, params) => client.query(queryText, params),
       release: () => client.release()
     };
