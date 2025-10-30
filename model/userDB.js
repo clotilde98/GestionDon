@@ -29,6 +29,16 @@ export const getUserById = async (SQLClient, id) => {
   return rows[0] || null;
 };
 
+export const getUserByEmail = async (SQLClient, email) => {
+  const { rows } = await SQLClient.query(
+    `SELECT *
+     FROM Client
+     WHERE email = $1`,
+    [email]
+  );
+  return rows[0] || null;
+};
+
 
 
 // Lire un utilisateur + sa première adresse

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import {checkJWT} from '../middleware/identification/jwt.js'
 import {
   createUserWithAddresses,
   getUserWithAddress,
@@ -10,8 +11,8 @@ import {
 const router = Router();
 
 router.post("/", createUser);           
-router.get("/:id", getUserWithAddress);         
-router.patch("/", updateUserWithAddress);     
-router.delete("/:id", deleteUser);       
+router.get("/:id", checkJWT, getUserWithAddress);         
+router.patch("/", checkJWT, updateUserWithAddress);     
+router.delete("/:id", checkJWT, deleteUser);       
 
 export default router;
