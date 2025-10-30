@@ -15,7 +15,6 @@ export const pool = {
   connect: async () => {
     const client = await pgPool.connect();
     return {
-      // expose exactement query(...) et release()
       query: async (queryText, params) => client.query(queryText, params),
       release: () => client.release()
     };
@@ -25,5 +24,5 @@ export const pool = {
 };
 
 process.on('exit', () => {
-  pgPool.end().then(() => console.log('pool closed')).catch(err => console.error(err));
+pgPool.end().then(() => console.log('pool closed'));
 });

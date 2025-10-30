@@ -63,3 +63,13 @@ export const deletePost = async (req, res) => {
         res.sendStatus(500);
     }
 };
+
+
+export const searchPostByCategory = async(req, res) => {
+    try {
+         const posts = await postModel.searchPostByCategory(pool, req.body);
+         res.status(200).send(posts);
+    }catch(err){
+        res.status(500).send(err.message);
+    }
+}

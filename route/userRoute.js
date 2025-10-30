@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {checkJWT} from '../middleware/identification/jwt.js'
 import {
-  createUserWithAddresses,
+  createUserWithAddress,
   getUserWithAddress,
   updateUserWithAddress,
   deleteUser,

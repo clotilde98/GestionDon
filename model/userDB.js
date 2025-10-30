@@ -26,7 +26,7 @@ export const getUserById = async (SQLClient, id) => {
      WHERE id = $1`,
     [id]
   );
-  return rows[0] || null;
+  return rows[0] ;
 };
 
 export const getUserByEmail = async (SQLClient, email) => {
@@ -83,79 +83,3 @@ export const deleteUser = async (SQLClient, id) => {
 };
 
 
-export const findUsersByUsername = async (SQLClient, searchTerm) => {
-    
-    
-    const searchPattern = `%${searchTerm}%`;
-
-    // CORRECTION: Utiliser le searchPattern comme paramètre de requête pour éviter les injections SQL.
-    const { rows } = await SQLClient.query(
-        `SELECT id, username, email, registration_date, photo, is_admin
-         FROM Client
-         WHERE username ILIKE $1`, 
-        [searchPattern] // Ajout du paramètre
-    );
-
-    return rows;
-};
-
-
-export const findUsersByUsernamePAGINATED = async (SQLClient, searchTerm, limit, offset) => {
-    
-    // Le terme de recherche avec des jokers (%) pour la recherche partielle insensible à la casse
-    const searchPattern = `%${searchTerm}%`;
-
-    // --- 1. Requête pour le COUNT TOTAL (sans pagination) ---
-    const countQuery = await SQLClient.query(
-        `SELECT COUNT(id) FROM Client
-         WHERE username ILIKE $1`,
-        [searchPattern]
-    );
-    const totalCount = parseInt(countQuery.rows[0].count, 10);
-    
-    // --- 2. Requête pour les DONNÉES PAGINÉES ---
-    const { rows } = await SQLClient.query(
-        `SELECT id, username, email, registration_date, photo, is_admin
-         FROM Client
-         WHERE username ILIKE $1
-         ORDER BY username ASC 
-         LIMIT $2 OFFSET $3`, // LIMIT et OFFSET appliquent la pagination
-        [searchPattern, limit, offset]
-    );
-
-    // Retourne les données paginées ET le total
-    return {
-        totalCount: totalCount,
-        users: rows
-    };
-};
-
-
-
-export const findUsersByUsernameAndFilter = async (SQLClient, searchTerm, adminFilter) => {
-    
-    // Le premier paramètre ($1) est toujours le searchPattern
-    const searchPattern = `%${searchTerm}%`;
-    let queryParams = [searchPattern];
-    let whereClauses = [`username ILIKE $1`];
-    
-    // --- Logique du Filtre is_admin ---
-    if (adminFilter === 'admins') {
-        whereClauses.push(`is_admin = TRUE`);
-    } else if (adminFilter === 'users') {
-        whereClauses.push(`is_admin = FALSE`);
-    }
-
-    // Jointure de toutes les clauses WHERE
-    const whereCondition = whereClauses.length > 0 ? `WHERE ` + whereClauses.join(' AND ') : '';
-
-    const { rows } = await SQLClient.query(
-        `SELECT id, username, email, registration_date, photo, is_admin
-         FROM Client
-         ${whereCondition}
-         ORDER BY username ASC`, 
-        queryParams
-    );
-
-    return rows; // Retourne la liste filtrée
-};
