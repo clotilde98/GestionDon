@@ -7,54 +7,47 @@ export const createUserWithAddress = async (req, res) => {
     let SQLClient; 
     
     try {
-        // CORRECTION MAJEURE : Décomposition des champs obligatoires et des champs optionnels.
-        const { 
-            username, email, password,photo, is_Admin: isAdmin,street, number,  postal_Code: postalCode,city,
-        } = req.body;
+        const { client, address } = req.body;
 
-    
+        if (!client || !address) {
+            return res.status(400).send("Les objets 'client' ou 'address' sont manquants dans la requête.");
+        }
 
-        // 2. Validation spécifique du numéro de rue
+        const { username, email, password } = client;
+        const { street, number, postalCode, city } = address;
+
+        if (!username || !email || !password || !street || !number || !postalCode || !city) {
+            return res.status(400).send("Champs utilisateur/adresse obligatoires manquants."); 
+        }
+
         if (isNaN(number) || parseInt(number) <= 0) { 
             return res.status(400).send("Le numéro de rue (number) doit être un entier positif."); 
         }
 
-        // --- Début de la transaction ---
         SQLClient = await pool.connect();
-        await SQLClient.query("BEGIN"); // Démarre la transaction
+        await SQLClient.query("BEGIN");  
         
-        // 3. Création du client : 'photo' et 'isAdmin' sont maintenant définis
-        const { id: clientID } = await userModel.createUser(SQLClient, { 
-            username, email, password, photo, isAdmin 
-        });
-        
-        // 4. Création de l'adresse
-        const address = await addressModel.createAddress(SQLClient, {
-            street, number, postalCode, city 
-        }, clientID);
+        const { id: clientID } = await userModel.createUser(SQLClient, client);
+        await addressModel.createAddress(SQLClient, {street, number, postalCode, city }, clientID);
 
-        await SQLClient.query("COMMIT"); // Termine la transaction
-        // --- Fin de la transaction ---
+        await SQLClient.query("COMMIT"); 
 
         return res.status(201).send({
             message: "Utilisateur et adresse créés avec succès",
-            userID: clientID, 
-            addressDetails: address
+            
         });
 
     } catch (err) {
         console.error("Erreur lors de l'enregistrement de l'utilisateur:", err); 
         
-        // Annulation de la transaction en cas d'erreur
         if (SQLClient) { 
             try {
                 await SQLClient.query("ROLLBACK");
-            } catch (errRollback) {
-                console.error("Erreur lors du ROLLBACK:", errRollback);
+            } catch (err) { 
+                console.error(err);
             }
         }
         
-        // Affiche l'erreur interne, car c'est une erreur SQL ou de serveur.
         return res.status(500).send("Erreur interne du serveur. L'opération a été annulée.");
         
     } finally {
