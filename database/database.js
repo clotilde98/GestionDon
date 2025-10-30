@@ -24,5 +24,5 @@ export const pool = {
 };
 
 process.on('exit', () => {
-  pgPool.end().then(() => console.log('pool closed')).catch(err => console.error(err));
+pgPool.end().then(() => console.log('pool closed'));
 });

@@ -3,7 +3,7 @@ export const createUser = async (SQLClient, { username, email, password, photo =
   const { rows } = await SQLClient.query(
     `INSERT INTO Client (username, email, password, photo, is_admin)
      VALUES ($1, $2, $3, $4, $5)
-     RETURNING *`,
+     RETURNING id`,
     [username, email, password, photo , isAdmin]
   );
   return rows[0];
