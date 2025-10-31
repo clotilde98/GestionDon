@@ -152,6 +152,70 @@ export const findUsersByUsernamePAGINATED = async (SQLClient, searchTerm, limit,
 };
 
 
+export const updateUserWithAddress = async (req, res) => {
+    let SQLClient; 
+    
+    try {
+        
+        const clientID = req.params.id; 
+        const { client, address } = req.body;
+
+        if (!client && !address) {
+            return res.status(400).send("Veuillez fournir des données d'utilisateur ou d'adresse à mettre à jour.");
+        }
+
+        SQLClient = await pool.connect();
+        await SQLClient.query("BEGIN"); 
+        
+        let userUpdated = null;
+        let addressUpdated = null;
+
+        if (client) {
+          
+            userUpdated = await userModel.updateUser(SQLClient, clientID, client); 
+        }
+        
+        if (address) {
+            
+            addressUpdated = await addressModel.updateAddress(SQLClient, clientID, address); 
+        }
+
+        if ((client && !userUpdated) || (address && !addressUpdated)) {
+             await SQLClient.query("ROLLBACK"); 
+             return res.status(404).send("Utilisateur ou adresse non trouvée pour l'ID : " + clientID);
+        }
+
+        await SQLClient.query("COMMIT"); 
+
+
+        return res.status(200).send({
+            message: "Utilisateur et adresse mis à jour avec succès",
+            userID: clientID,
+            updatedUser: userUpdated || client, 
+            updatedAddress: addressUpdated || address 
+        });
+
+    } catch (err) {
+        console.error("Erreur lors de la mise à jour de l'utilisateur:", err); 
+        
+        if (SQLClient) { 
+            try {
+                await SQLClient.query("ROLLBACK");
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        
+        return res.status(500).send("Erreur interne du serveur. La mise à jour a été annulée.");
+        
+    } finally {
+        if (SQLClient) {
+            SQLClient.release(); 
+        }
+    }
+};
+
+
 export const findUsersByUsernameAndFilter = async (SQLClient, searchTerm, adminFilter) => {
     
     // Le premier paramètre ($1) est toujours le searchPattern
