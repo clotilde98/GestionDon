@@ -2,8 +2,6 @@ import { pool } from "../database/database.js";
 import * as userModel from "../model/userDB.js";
 import * as addressModel from "../model/addressDB.js";
 
-<<<<<<< HEAD
-=======
 export const createUser = async (req, res) => {
   try {
     const newClient = await userModel.createUser(pool, req.body);
@@ -19,7 +17,6 @@ export const createUserWithAddresses = async (req, res) => {
   let SQLClient;
   try {
     const { user, addresses } = req.body;
->>>>>>> 725ab1990e506c6539c3a77d0631aeed9b74304f
 
 export const createUserWithAddress = async (req, res) => {
     let SQLClient; 
