@@ -10,6 +10,7 @@ import {
 
 const router = Router();
 
+router.post("/", createUserWithAddress);  
 router.post("/", createUser);           
 router.get("/:id", checkJWT, getUserWithAddress);         
 router.patch("/", checkJWT, updateUserWithAddress);     
