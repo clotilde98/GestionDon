@@ -2,8 +2,6 @@ import { pool } from "../database/database.js";
 import * as userModel from "../model/userDB.js";
 import * as addressModel from "../model/addressDB.js";
 
-<<<<<<< HEAD
-=======
 export const createUser = async (req, res) => {
   try {
     const newClient = await userModel.createUser(pool, req.body);
@@ -17,19 +15,10 @@ export const createUser = async (req, res) => {
 // Créer un utilisateur + plusieurs adresses
 export const createUserWithAddresses = async (req, res) => {
   let SQLClient;
-  try {
-    const { user, addresses } = req.body;
->>>>>>> 725ab1990e506c6539c3a77d0631aeed9b74304f
-
-export const createUserWithAddress = async (req, res) => {
-    let SQLClient; 
+  
     
     try {
         const { client, address } = req.body;
-
-        if (!client || !address) {
-            return res.status(400).send("Les objets 'client' ou 'address' sont manquants dans la requête.");
-        }
 
         const { username, email, password } = client;
         const { street, number, postalCode, city } = address;
@@ -93,13 +82,9 @@ export const getUserWithAddress = async (req, res) => {
             address: address || null 
         };
 
-<<<<<<< HEAD
-        return res.status(200).json(userDetails);
-=======
     const userWithAddress = await userModel.getUserWithAddress(pool, id);
     
     if (!userWithAddress) return res.status(404).json({ error: "Utilisateur non trouvé" });
->>>>>>> 725ab1990e506c6539c3a77d0631aeed9b74304f
 
     } catch (err) {
     }
