@@ -4,20 +4,20 @@ import argon2 from "argon2";
 
 
 // Créer un utilisateur
-export const createUser = async (SQLClient, { username, email, password, photo = null, is_admin = false }) => {
+export const createUser = async (SQLClient, { username, email, password,number,street, photo = null, is_admin = false }) => {
   const pepper = process.env.PEPPER;
   const passwordWithPepper = password + pepper;
   const hash = await argon2.hash(passwordWithPepper);
   const { rows } = await SQLClient.query(
-    `INSERT INTO Client (username, email, password, photo, is_admin) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [username, email, hash, photo, is_admin]
+    `INSERT INTO Client (username, email, password,number,street, photo, is_admin) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+    [username, email, hash,number,street,photo, is_admin]
   );
   return rows[0];
 };
 
 export const getUserById = async (SQLClient, id) => {
   const { rows } = await SQLClient.query(
-    `SELECT id, username, password, email, registration_date, photo, is_admin
+    `SELECT *
      FROM Client
      WHERE id = $1`,
     [id]

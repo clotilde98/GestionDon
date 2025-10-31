@@ -11,6 +11,9 @@ CREATE TABLE Client (
     username VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    street VARCHAR(100) NOT NULL,
+    number INT NOT NULL ,
+    CHECK (number > 0),
     registration_date DATE DEFAULT NOW(),
     photo VARCHAR(255) NULL,
     is_admin BOOLEAN DEFAULT FALSE
@@ -18,11 +21,8 @@ CREATE TABLE Client (
 
 CREATE TABLE Address (
     id SERIAL PRIMARY KEY,
-    street VARCHAR(100) NOT NULL,
-    number INT NOT NULL ,
     city VARCHAR(50) NOT NULL,
     postal_code VARCHAR(10) NOT NULL,
-    CHECK (number > 0),
     client_id INT REFERENCES Client(id) ON DELETE CASCADE
 );
 
