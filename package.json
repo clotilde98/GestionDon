@@ -13,11 +13,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-<<<<<<< HEAD
     "bcrypt": "^6.0.0",
-=======
-    "argon2": "^0.44.0",
->>>>>>> 725ab1990e506c6539c3a77d0631aeed9b74304f
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
